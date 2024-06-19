@@ -6,6 +6,7 @@ pragma solidity ^0.8.9;
 contract Assessment {
     address payable public owner;
     uint256 public balance;
+    mapping(address=>uint256) public Amount; //new addition
 
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
@@ -56,5 +57,25 @@ contract Assessment {
 
         // emit the event
         emit Withdraw(_withdrawAmount);
+    }
+    function Bank_transfer(uint256 amount, address _address) public payable {
+        require(msg.sender == owner, "You are not the owner of this account");
+        uint _previousBalance = balance;
+        if (balance < amount) {
+            revert InsufficientBalance({
+                balance: balance,
+                withdrawAmount: amount
+            });
+        }
+
+        // decrease the given amount
+        balance -= amount;
+        Amount[_address]=amount;            ///new addition
+
+        // assert the balance is correct
+        assert(balance == (_previousBalance - amount));
+
+        // emit the event
+        emit Withdraw(amount);
     }
 }
